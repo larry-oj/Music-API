@@ -2,7 +2,7 @@
 
 namespace DotNetMusicApi.Services;
 
-public interface ISpotifyService
+public interface ISpotifyService : IDisposable
 {
     Task<List<Track>> SearchTracksAsync(string query, int limit);
 }

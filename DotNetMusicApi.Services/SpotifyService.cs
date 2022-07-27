@@ -13,7 +13,7 @@ public class SpotifyService : ISpotifyService
     private readonly SpotifyOptions _spotifyOptions;
     private readonly IConfiguration _configuration;
     private readonly ILogger<SpotifyService> _logger;
-    private readonly IHttpClientFactory _httpClientFactory;
+    private readonly HttpClient _httpClient;
 
     public SpotifyService(SpotifyOptions spotifyOptions, 
         ILogger<SpotifyService> logger, 
@@ -22,7 +22,7 @@ public class SpotifyService : ISpotifyService
     {
         _spotifyOptions = spotifyOptions;
         _logger = logger;
-        _httpClientFactory = clientFactory;
+        _httpClient = clientFactory.CreateClient();
         _configuration = configuration;
     }
 
@@ -33,30 +33,32 @@ public class SpotifyService : ISpotifyService
             _logger.LogError("Spotify token is null");
             throw new DataException("Spotify token is null");
         }
-        
-        string content;
-        using (var client = _httpClientFactory.CreateClient())
-        {
-            var uri = new Uri(_configuration.GetSection("Spotify:SearchUrl").Value)
-                .AppendParameter("q", query)
-                .AppendParameter("type", "track")
-                .AppendParameter("limit", limit.ToString());
 
-            var request = new HttpRequestMessage
+        var uri = new Uri(_configuration.GetSection("Spotify:SearchUrl").Value)
+            .AppendParameter("q", query)
+            .AppendParameter("type", "track")
+            .AppendParameter("limit", limit.ToString());
+
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = uri,
+            Headers =
             {
-                Method = HttpMethod.Get,
-                RequestUri = uri,
-                Headers =
-                {
-                    { "Authorization", $@"Bearer {_spotifyOptions.Token}" }
-                }
-            };
-            
-            var response = await client.SendAsync(request);
-            content = await response.Content.ReadAsStringAsync();
-        }
+                { "Authorization", $@"Bearer {_spotifyOptions.Token}" }
+            }
+        };
+        
+        var response = await _httpClient.SendAsync(request);
+        string content = await response.Content.ReadAsStringAsync();
+        
 
         var spotifySearchResponse = JsonSerializer.Deserialize<SpotifySearchResponse>(content);
         return spotifySearchResponse!.Tracks;
+    }
+
+    public void Dispose()
+    {
+        _httpClient?.Dispose();
     }
 }

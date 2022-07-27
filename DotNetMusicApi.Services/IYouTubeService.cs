@@ -2,7 +2,7 @@
 
 namespace DotNetMusicApi.Services;
 
-public interface IYouTubeService
+public interface IYouTubeService : IDisposable
 {
     Task<List<Item>> SearchVideosAsync(string query, int limit);
 }
