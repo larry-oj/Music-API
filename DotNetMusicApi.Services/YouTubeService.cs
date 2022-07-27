@@ -22,7 +22,7 @@ public class YouTubeService : IYouTubeService
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<List<Item>> SearchVideos(string query, int limit)
+    public async Task<List<Item>> SearchVideosAsync(string query, int limit)
     {
         string content;
         using (var client = _httpClientFactory.CreateClient())

@@ -26,7 +26,7 @@ public class SpotifyService : ISpotifyService
         _configuration = configuration;
     }
 
-    public async Task<List<Track>> SearchTracks(string query, int limit)
+    public async Task<List<Track>> SearchTracksAsync(string query, int limit)
     {
         if (string.IsNullOrEmpty(_spotifyOptions.Token))
         {

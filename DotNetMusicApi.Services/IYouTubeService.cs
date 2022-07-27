@@ -4,5 +4,5 @@ namespace DotNetMusicApi.Services;
 
 public interface IYouTubeService
 {
-    Task<List<Item>> SearchVideos(string query, int limit);
+    Task<List<Item>> SearchVideosAsync(string query, int limit);
 }
