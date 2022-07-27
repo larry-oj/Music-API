@@ -10,6 +10,7 @@ builder.Services.AddSingleton<SpotifyOptions>();
 builder.Services.AddHostedService<TimedTokenService>();
 builder.Services.AddTransient<ISpotifyService, SpotifyService>();
 builder.Services.AddTransient<IYouTubeService, YouTubeService>();
+builder.Services.AddTransient<IConversionService, ConversionService>();
 
 var app = builder.Build();
 
