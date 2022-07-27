@@ -29,8 +29,7 @@ public class TimedTokenService : IHostedService, IDisposable
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _logger.LogInformation("Timed token service is running");
-
-        Generate(null);
+        
         _timer = new Timer(Generate, null, TimeSpan.Zero, TimeSpan.FromMinutes(45));
 
         return Task.CompletedTask;
@@ -38,6 +37,8 @@ public class TimedTokenService : IHostedService, IDisposable
 
     private void Generate(object? state)
     {
+        _logger.LogInformation("Generating new spotify token");
+        
         var tokenUrl = _configuration.GetSection("Spotify:TokenUrl").Value;
         var clientId = _configuration.GetSection("Spotify:ClientId").Value;
         var clientSecret = _configuration.GetSection("Spotify:ClientSecret").Value;
