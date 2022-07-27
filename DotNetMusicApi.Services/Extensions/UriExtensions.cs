@@ -1,6 +1,6 @@
 ﻿using System.Web;
 
-namespace DotNetMusicApi.Extensions;
+namespace DotNetMusicApi.Services.Extensions;
 
 public static class UriExtensions
 {

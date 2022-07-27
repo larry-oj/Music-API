@@ -1,4 +1,4 @@
-using DotNetMusicApi.Options;
+using DotNetMusicApi.Services.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
