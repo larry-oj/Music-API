@@ -8,6 +8,7 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<SpotifyOptions>();
 builder.Services.AddHostedService<TimedTokenService>();
+builder.Services.AddTransient<ISpotifyService, SpotifyService>();
 
 var app = builder.Build();
 

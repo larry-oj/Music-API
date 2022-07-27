@@ -84,6 +84,6 @@ public class TimedTokenService : IHostedService, IDisposable
 
     public void Dispose()
     {
-        _timer.Dispose();
+        _timer?.Dispose();
     }
 }
