@@ -1,3 +1,4 @@
+using DotNetMusicApi.Services;
 using DotNetMusicApi.Services.Options;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<SpotifyOptions>();
+builder.Services.AddHostedService<TimedTokenService>();
 
 var app = builder.Build();
 
