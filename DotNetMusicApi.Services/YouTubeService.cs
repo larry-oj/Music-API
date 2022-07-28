@@ -38,8 +38,9 @@ public class YouTubeService : IYouTubeService
 
         var response = await _httpClient.SendAsync(request);
         string content = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode) throw new DataException(content);
 
-            var youtubeSearchResponse = JsonSerializer.Deserialize<YouTubeSearchResponse>(content) ?? throw new InvalidOperationException();
+        var youtubeSearchResponse = JsonSerializer.Deserialize<YouTubeSearchResponse>(content)!;
         return youtubeSearchResponse.Items.
             Where(i => i.Id.Kind == "youtube#video")
             .ToList();
