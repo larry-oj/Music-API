@@ -56,4 +56,36 @@ public class SearchController : ControllerBase
             return StatusCode(500, errMsg);
         }
     }
+
+    [HttpGet]
+    [Route("youtube")]
+    public async Task<IActionResult> SearchYoutube([FromQuery] SearchQueryRequest parameters)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        if (string.IsNullOrEmpty(parameters.Query))
+        {
+            _logger.LogError("Query is null");
+            return BadRequest("Query is null");
+        }
+
+        if (parameters.Limit is <= 0 or > 15)
+        {
+            _logger.LogError("Invalid limit value. Must be higher than 0 and lower then 16");
+            return BadRequest("Invalid limit value. Must be higher than 0 and lower then 16");
+        }
+        
+        try
+        {
+            var searchResult = await _youTubeService.SearchVideosAsync(parameters.Query, parameters.Limit);
+            return Ok(new YouTubeSearchResponse(searchResult));
+        }
+        catch (Exception ex)
+        {
+            var errMsg = ex is DataException ? "Sorry! YouTube service is currently unavailable" : "Sorry! Something went wrong";
+            _logger.LogError(ex, errMsg);
+            return StatusCode(500, errMsg);
+        }
+    }
 }
