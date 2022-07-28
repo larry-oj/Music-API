@@ -1,4 +1,6 @@
-﻿using DotNetMusicApi.Services;
+﻿using System.Data;
+using DotNetMusicApi.Models;
+using DotNetMusicApi.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DotNetMusicApi.Controllers;
@@ -23,5 +25,35 @@ public class SearchController : ControllerBase
         _configuration = configuration;
     }
     
-    // ...
+    [HttpGet]
+    [Route("spotify")]
+    public async Task<IActionResult> SearchSpotify ([FromQuery] SearchQueryRequest parameters)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        if (string.IsNullOrEmpty(parameters.Query))
+        {
+            _logger.LogError("Query is null");
+            return BadRequest("Query is null");
+        }
+
+        if (parameters.Limit is <= 0 or > 15)
+        {
+            _logger.LogError("Invalid limit value. Must be higher than 0 and lower then 16");
+            return BadRequest("Invalid limit value. Must be higher than 0 and lower then 16");
+        }
+
+        try
+        {
+            var searchResult = await _spotifyService.SearchTracksAsync(parameters.Query, parameters.Limit);
+            return Ok(new SpotifySearchResponse(searchResult));
+        }
+        catch (Exception ex)
+        {
+            var errMsg = ex is DataException ? "Sorry! Spotify service is currently unavailable" : "Sorry! Something went wrong";
+            _logger.LogError(ex, errMsg);
+            return StatusCode(500, errMsg);
+        }
+    }
 }
