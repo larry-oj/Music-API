@@ -54,7 +54,7 @@ public class SpotifyService : ISpotifyService
         
 
         var spotifySearchResponse = JsonSerializer.Deserialize<SpotifySearchResponse>(content);
-        return spotifySearchResponse!.Tracks;
+        return spotifySearchResponse!.Items.Tracks;
     }
 
     public void Dispose()
