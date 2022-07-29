@@ -13,6 +13,11 @@ public class ConverterEnqueueRequest
     [JsonPropertyName("callback_url")] 
     public string? CallbackUrl { get; set; }
 
+    public ConverterEnqueueRequest()
+    {
+        
+    }
+    
     public ConverterEnqueueRequest(string url)
     {
         Url = url;

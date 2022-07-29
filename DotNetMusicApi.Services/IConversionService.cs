@@ -6,6 +6,7 @@ public interface IConversionService : IDisposable
 {
     Task<string> EnqueueWebHookedAsync(string url, string callbackUrl);
     Task<string> EnqueueAsync(string url);
+    Task<ConverterEnqueueResponse> EnqueueAsync(ConverterEnqueueRequest data);
     Task<ConverterStatusResponse> GetStatusAsync(string id);
     Task<ConverterFile> GetFileAsync(string id);
     Task<ConverterFile> GetFileBlockingAsync(string url);

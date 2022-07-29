@@ -76,6 +76,35 @@ public class ConversionService : IConversionService
         return data.Id;
     }
 
+    public async Task<ConverterEnqueueResponse> EnqueueAsync(ConverterEnqueueRequest data)
+    {
+        if (data is null) 
+        {
+            _logger.LogError("Data is null");
+            throw new ArgumentNullException("Data error");
+        }
+        if (data.WithCallback && string.IsNullOrEmpty(data.CallbackUrl))
+        {
+            _logger.LogError("СallbackUrl is null");
+            throw new ArgumentNullException("СallbackUrl is null");
+        }
+        
+        var uri = new Uri(_configuration.GetSection("Converter:EnqueueUrl").Value);
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Post,
+            RequestUri = uri,
+            Content = JsonContent.Create(data)
+        };
+        
+        var response = await _httpClient.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode) 
+            throw new Exception(content);
+        
+        return JsonSerializer.Deserialize<ConverterEnqueueResponse>(content) ?? throw new InvalidOperationException();
+    }
+
     public async Task<ConverterStatusResponse> GetStatusAsync(string id)
     {
         if (string.IsNullOrEmpty(id))
@@ -107,7 +136,7 @@ public class ConversionService : IConversionService
             throw new ArgumentNullException("Id is null");
         }
 
-        var uri = new Uri(_configuration.GetSection("Converter:StatusUrl").Value.Replace(@"{id}", id));
+        var uri = new Uri(_configuration.GetSection("Converter:FileUrl").Value.Replace(@"{id}", id));
         var request = new HttpRequestMessage
         {
             Method = HttpMethod.Get,
