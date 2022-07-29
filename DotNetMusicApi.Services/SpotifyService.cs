@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using DotNetMusicApi.Services.Extensions;
 using DotNetMusicApi.Services.Models.Spotify;
 using DotNetMusicApi.Services.Options;
@@ -55,6 +56,43 @@ public class SpotifyService : ISpotifyService
 
         var spotifySearchResponse = JsonSerializer.Deserialize<SpotifySearchResponse>(content);
         return spotifySearchResponse!.Items.Tracks;
+    }
+
+    public async Task<string> GetTrackName(string url)
+    {
+        if (string.IsNullOrEmpty(_spotifyOptions.Token))
+        {
+            _logger.LogError("Spotify token is null");
+            throw new Exception("Spotify token is null");
+        }
+        
+        var trackId = Regex.Match(url, @"track\/(\w+)\?*").Groups[1].Value;
+
+        if (string.IsNullOrEmpty(trackId))
+        {
+            _logger.LogError("Link is invalid (invalid id)");
+            throw new ArgumentNullException("Link is invalid (invalid id)");
+        }
+        
+        var uri = new Uri(_configuration.GetSection("Spotify:TrackUrl").Value.Replace(@"{id}", trackId));
+
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = uri,
+            Headers =
+            {
+                { "Authorization", $@"Bearer {_spotifyOptions.Token}" }
+            }
+        };
+        
+        var response = await _httpClient.SendAsync(request);
+        var content = await response.Content.ReadAsStringAsync();
+        if (!response.IsSuccessStatusCode)
+            throw new DataException("Link is invalid");
+        
+        var spotifyTrack = JsonSerializer.Deserialize<Track>(content);
+        return spotifyTrack!.Name + " - " + spotifyTrack!.Artists[0].Name;
     }
 
     public void Dispose()

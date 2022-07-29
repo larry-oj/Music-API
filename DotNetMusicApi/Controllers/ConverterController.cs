@@ -1,4 +1,6 @@
-﻿using DotNetMusicApi.Services;
+﻿using System.Data;
+using System.Text.RegularExpressions;
+using DotNetMusicApi.Services;
 using DotNetMusicApi.Services.Models.Converter;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,15 +12,21 @@ public class ConverterController : ControllerBase
 {
     private readonly ILogger<SearchController> _logger;
     private readonly IConversionService _conversionService;
+    private readonly ISpotifyService _spotifyService;
+    private readonly IYouTubeService _youTubeService;
     private readonly IConfiguration _configuration;
 
     public ConverterController(ILogger<SearchController> logger, 
         IConversionService conversionService, 
-        IConfiguration configuration)
+        IConfiguration configuration, 
+        ISpotifyService spotifyService, 
+        IYouTubeService youTubeService)
     {
         _logger = logger;
         _conversionService = conversionService;
         _configuration = configuration;
+        _spotifyService = spotifyService;
+        _youTubeService = youTubeService;
     }
     
     [HttpPost]
@@ -30,12 +38,19 @@ public class ConverterController : ControllerBase
 
         try
         {
+            if (Regex.IsMatch(data.Url, @"spotify\.com"))
+            {
+                var trackName = await _spotifyService.GetTrackName(data.Url);
+                var ytData = await _youTubeService.SearchVideosAsync(trackName, 1);
+                data.Url = "https://www.youtube.com/watch?v=" + ytData[0].Id.VideoId;
+            }
+            
             return Ok(await _conversionService.EnqueueAsync(data));
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Returning error");
-            if (ex is ArgumentNullException or ApiException)
+            if (ex is ArgumentNullException or DataException or ApiException)
             {
                 return BadRequest(ex.Message);
             }
