@@ -145,7 +145,7 @@ public class ConversionService : IConversionService
         
         var response = await _httpClient.SendAsync(request);
         if (!response.IsSuccessStatusCode) 
-            throw new Exception(await response.Content.ReadAsStringAsync());
+            throw new ApiException(await response.Content.ReadAsStringAsync());
         
         var fileStream = await response.Content.ReadAsStreamAsync();
         var contentType = response.Content.Headers.ContentType?.MediaType;
@@ -154,7 +154,7 @@ public class ConversionService : IConversionService
         if (contentType is null || fileName is null)
         {
             _logger.LogError("Error retrieving file");
-            throw new Exception("Error retrieving file");
+            throw new ApiException("Error retrieving file");
         }
 
         return new ConverterFile(fileStream, contentType, fileName);
@@ -168,5 +168,13 @@ public class ConversionService : IConversionService
     public void Dispose()
     {
         _httpClient?.Dispose();
+    }
+}
+
+public class ApiException : Exception
+{
+    public ApiException(string message)
+        : base(message)
+    {
     }
 }

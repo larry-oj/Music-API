@@ -72,7 +72,11 @@ public class ConverterController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Returning error");
-            return ex is ArgumentNullException ? BadRequest(ex.Message) : StatusCode(500, "Sorry! Something went wrong");
+            if (ex is ArgumentNullException or ApiException)
+            {
+                return BadRequest(ex.Message);
+            }
+            return StatusCode(500, "Sorry! Something went wrong");
         }
     }
 }
