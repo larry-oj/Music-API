@@ -9,9 +9,9 @@ builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<SpotifyOptions>();
 builder.Services.AddHostedService<TimedTokenService>();
-builder.Services.AddTransient<ISpotifyService, SpotifyService>();
-builder.Services.AddTransient<IYouTubeService, YouTubeService>();
-builder.Services.AddTransient<IConversionService, ConversionService>();
+builder.Services.AddScoped<ISpotifyService, SpotifyService>();
+builder.Services.AddScoped<IYouTubeService, YouTubeService>();
+builder.Services.AddScoped<IConversionService, ConversionService>();
 
 var app = builder.Build();
 
