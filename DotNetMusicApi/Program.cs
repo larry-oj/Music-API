@@ -12,6 +12,7 @@ builder.Services.AddHostedService<TimedTokenService>();
 builder.Services.AddScoped<ISpotifyService, SpotifyService>();
 builder.Services.AddScoped<IYouTubeService, YouTubeService>();
 builder.Services.AddScoped<IConversionService, ConversionService>();
+builder.Services.AddScoped<IRecognitionService, AuddService>();
 
 var app = builder.Build();
 
